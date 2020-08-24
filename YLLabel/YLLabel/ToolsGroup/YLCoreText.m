@@ -33,82 +33,13 @@ NSString * const kYLWebLinkRegula = @"(?<=\\<WebLink:).*?(?=\\>)";
  * @param attrString 绘制内容
  * @param rect 绘制区域
  */
-CTFrameRef getFrameRefByAttrString(NSAttributedString *attrString, CGRect rect){
-    ///绘制局域
-    CGPathRef path = CGPathCreateWithRect(rect, nil);
-    //设置绘制内容
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
+CTFrameRef getCTFrameWithAttrString(NSAttributedString *attrString, CGRect rect){
+    CGPathRef path = CGPathCreateWithRect(rect, nil);///绘制局域
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);//设置绘制内容
     CTFrameRef frameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil);
     CFRelease(framesetter);
     CGPathRelease(path);
     return frameRef;
-}
-
-/** 获得内容分页列表
- * @param attrString 内容
- * @param rect 显示范围
- */
-NSMutableArray<NSValue *> *getPageingRanges(NSAttributedString *attrString, CGRect rect){
-    NSMutableArray *rangeArray = [NSMutableArray array];
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
-    CGPathRef path = CGPathCreateWithRect(rect, nil);
-    CFRange range = CFRangeMake(0, 0);
-    NSInteger rangeOffset = 0;
-    do {
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(rangeOffset, 0), path, nil);
-        range = CTFrameGetVisibleStringRange(frame);
-        [rangeArray addObject:[NSValue valueWithRange:NSMakeRange(rangeOffset, range.length)]];
-        CFRelease(frame);
-        rangeOffset += range.length;
-    } while (range.location + range.length < attrString.length);
-    CFRelease(framesetter);
-    CGPathRelease(path);
-    return rangeArray;
-}
-
-/// 获取指定内容高度
-///
-/// - Parameters:
-///   - attrString: 内容
-///   - maxW: 最大宽度
-/// - Returns: 当前高度
-
-CGFloat getAttrStringHeight(NSAttributedString *attrString,CGFloat maxW){
-    CGFloat height = 0;
-    if (attrString.length > 0){
-        // 注意设置的高度必须大于文本高度
-        CGFloat maxH = 1000;
-        CGRect drawingRect = CGRectMake(0, 0, maxW, maxH);
-
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
-        CGPathRef path = CGPathCreateWithRect(drawingRect, nil);
-        CTFrameRef frameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil);
-        
-        /// 释放资源
-        CFRelease(framesetter);
-        CGPathRelease(path);
-                
-        CFArrayRef lines = CTFrameGetLines(frameRef);//as! [CTLine]
-        int lineCount = (int)CFArrayGetCount(lines);
-        
-        CGPoint origins[lineCount];
-        for (int i = 0; i < lineCount; i++) {
-            origins[i] = CGPointZero;
-        }
-        CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), origins);
-        
-        CGPoint point = origins[lineCount - 1];
-        CGFloat lineY = point.y;
-        CGFloat lineAscent = 0;
-        CGFloat lineDescent = 0;
-        CGFloat lineLeading = 0;
-        CTLineRef line = CFArrayGetValueAtIndex(lines, lineCount - 1);
-        CTLineGetTypographicBounds(line, &lineAscent, &lineDescent, &lineLeading);
-        height = maxH - lineY + ceil(lineDescent);
-        
-        CFRelease(frameRef);
-    }
-    return height;
 }
 
 /// 通过 [CGRect] 获得合适的 MenuRect
@@ -144,82 +75,6 @@ CGRect getMenuRect(NSArray<NSValue *> *rects,CGRect viewFrame){
     return menuRect;
 }
 
-/// 获得触摸位置在哪一行
-///
-/// - Parameters:
-///   - point: 触摸位置
-///   - frameRef: CTFrame
-/// - Returns: CTLine
-CTLineRef getTouchLine(CGPoint point,CTFrameRef frameRef){
-    CTLineRef line = nil;
-    if (frameRef == nil) { return line; }
-    
-    CGPathRef path = CTFrameGetPath(frameRef);
-    CGRect bounds = CGPathGetBoundingBox(path);
-    //CGPathRelease(path);
-    
-    CFArrayRef lines = CTFrameGetLines(frameRef);
-    int lineCount = (int)CFArrayGetCount(lines);
-    
-    if (lineCount < 1) {
-        return line;
-    }
-    
-    CGPoint origins[lineCount];
-    for (int i = 0; i < lineCount; i++) {
-        origins[i] = CGPointZero;
-    }
-    CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), origins);
-    for (int i = 0; i < lineCount; i ++) {
-        CGPoint origin = origins[i];
-        CTLineRef tempLine = CFArrayGetValueAtIndex(lines, i);
-        CGFloat lineAscent = 0;
-        CGFloat lineDescent = 0;
-        CGFloat lineLeading = 0;
-        CTLineGetTypographicBounds(tempLine, &lineAscent, &lineDescent, &lineLeading);
-        CGFloat lineWidth = bounds.size.width;
-        CGFloat lineheight = lineAscent + lineDescent + lineLeading;
-        
-        CGRect lineFrame = CGRectMake(origin.x, bounds.size.height - origin.y - lineAscent, lineWidth, lineheight);
-        lineFrame = CGRectInset(lineFrame, -5, -5);
-        if (CGRectContainsPoint(lineFrame, point)) {
-            line = tempLine;
-            break;
-        }
-    }
-    return line;
-}
-
-/// 获得触摸位置那一行文字的Range
-///
-/// - Parameters:
-///   - point: 触摸位置
-///   - frameRef: CTFrame
-/// - Returns: CTLine
-NSRange getTouchLineRange(CGPoint point,CTFrameRef frameRef){
-    NSRange range = NSMakeRange(NSNotFound, 0);
-    CTLineRef line = getTouchLine(point, frameRef);
-    if (line) {
-        CFRange lineRange = CTLineGetStringRange(line);
-        range = NSMakeRange(lineRange.location == kCFNotFound ? NSNotFound : lineRange.location, lineRange.length);
-    }
-    return range;
-}
-
-/// 获得触摸位置文字的Location
-///
-/// - Parameters:
-///   - point: 触摸位置
-///   - frameRef: CTFrame
-/// - Returns: 触摸位置的Index
-signed long getTouchLocation(CGPoint point,CTFrameRef frameRef){
-    signed long location = -1;
-    CTLineRef line = getTouchLine(point,frameRef);
-    if (line != nil) {
-        location = CTLineGetStringIndexForPosition(line, point);
-    }
-    return location;
-}
 
 
 
@@ -299,16 +154,6 @@ NSMutableArray<NSValue *> *getRangeRects(NSRange range,CTFrameRef frameRef,NSStr
     return rects;
 }
 
-@end
-
-
-
-
-
-
-
-@implementation YLCoreText (Page)
-
 void handleAttrString(NSMutableAttributedString *attrString, CGRect rect){
     NSString *string = [attrString.string copy];
     NSString *regula = [NSString stringWithFormat:@"%@|%@",kYLImageLinkRegula,kYLWebLinkRegula];
@@ -350,58 +195,189 @@ void handleAttrString(NSMutableAttributedString *attrString, CGRect rect){
     }
 }
 
+@end
+
+
+
+
+
+
+
+@implementation YLCoreText (Page)
+
+/** 根据页面 rect 将文本分页
+ * @param attrString 内容
+ * @param rect 显示范围
+ * @return 返回每页需要展示的 Range
+ */
+NSMutableArray<NSValue *> *getPageRanges(NSAttributedString *attrString, CGRect rect){
+    NSMutableArray *rangeArray = [NSMutableArray array];
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
+    CGPathRef path = CGPathCreateWithRect(rect, nil);
+    CFRange range = CFRangeMake(0, 0);
+    NSInteger rangeOffset = 0;
+    do {
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(rangeOffset, 0), path, nil);
+        range = CTFrameGetVisibleStringRange(frame);
+        [rangeArray addObject:[NSValue valueWithRange:NSMakeRange(rangeOffset, range.length)]];
+        CFRelease(frame);
+        rangeOffset += range.length;
+    } while (range.location + range.length < attrString.length);
+    CFRelease(framesetter);
+    CGPathRelease(path);
+    return rangeArray;
+}
 
 /** 将内容分为多页
  * @param attrString 展示的内容
  * @prama rect 显示范围
  */
-NSMutableArray<YLPageModel *> *pageingWithAttrString(NSMutableAttributedString *attrString, CGRect rect){
+NSMutableArray<YLPageModel *> * getPageModels(NSMutableAttributedString *attrString, CGRect rect){
     NSMutableArray<YLPageModel *> *pageModels = [NSMutableArray array];
-    handleAttrString(attrString, rect);
-    NSMutableArray<NSValue *> *ranges = getPageingRanges(attrString, rect);
-          
-    if (ranges && ranges.count) {
-        [ranges enumerateObjectsUsingBlock:^(NSValue * _Nonnull rangeValue, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSRange range = rangeValue.rangeValue;
-            NSAttributedString *content = [attrString attributedSubstringFromRange:range];
-            YLPageModel *pageModel = [[YLPageModel alloc]init];
-            pageModel.range = range;
-            pageModel.content = content;
-            pageModel.page = idx;
-            pageModel.frameRef = getFrameRefByAttrString(content,rect);
+
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
+    CGPathRef path = CGPathCreateWithRect(rect, nil);
+    CFRange range = CFRangeMake(0, 0);
+    NSInteger rangeOffset = 0;
+    do {
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(rangeOffset, 0), path, nil);
+        range = CTFrameGetVisibleStringRange(frame);/// 获取实际填充 CTFrameRef 的字符范围
+                
+        YLPageModel *pageModel = [[YLPageModel alloc]init];
+        pageModel.range = NSMakeRange(rangeOffset, range.length);
+        pageModel.content = [attrString attributedSubstringFromRange:pageModel.range];;
+        pageModel.page = pageModels.count;
+        pageModel.frameRef = frame;
+        [YLCoreText setImageFrametWithCTFrame:pageModel.frameRef];
+        pageModel.contentHeight = getHeightWithCTFrame(pageModel.frameRef);
+        [pageModels addObject:pageModel];
+        
+        rangeOffset += range.length;
+    } while (range.location + range.length < attrString.length);
+    CFRelease(framesetter);
+    CGPathRelease(path);
+    
+    return pageModels;
+}
+
+///每页的 CTFrame 高度自适应内容
+NSMutableArray<YLPageModel *> *getPageModelsAutoHeight(NSMutableAttributedString *attrString, CGRect rect){
+    NSMutableArray<YLPageModel *> *pageModels = [NSMutableArray array];
+
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
+    CGPathRef path = CGPathCreateWithRect(rect, nil);
+    CFRange range = CFRangeMake(0, 0);
+    NSInteger rangeOffset = 0;
+    do {
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(rangeOffset, 0), path, nil);
+        range = CTFrameGetVisibleStringRange(frame);/// 获取实际填充 CTFrameRef 的字符范围
+        
+        
+        YLPageModel *pageModel = [[YLPageModel alloc]init];
+        pageModel.range = NSMakeRange(rangeOffset, range.length);
+        pageModel.content = [attrString attributedSubstringFromRange:pageModel.range];;
+        pageModel.page = pageModels.count;
+        
+        [YLCoreText setImageFrametWithCTFrame:frame];
+        pageModel.contentHeight = getHeightWithCTFrame(frame);
+                
+        if (fabs(CGRectGetHeight(rect) - pageModel.contentHeight) < 10) {
+            pageModel.frameRef = frame;
+        }else{
+            pageModel.frameRef = getCTFrameWithAttrString(pageModel.content, CGRectMake(0, 0, CGRectGetWidth(rect), pageModel.contentHeight));
             [YLCoreText setImageFrametWithCTFrame:pageModel.frameRef];
-            [pageModels addObject:pageModel];
-        }];
-    }    
+        }
+        [pageModels addObject:pageModel];
+        
+        
+        rangeOffset += range.length;
+    } while (range.location + range.length < attrString.length);
+    CFRelease(framesetter);
+    CGPathRelease(path);
     return pageModels;
 }
 
 @end
 
+/// 获取高度
+@implementation YLCoreText (ContentHeight)
 
-/** 绘制图片的时候实际上在一个 CTRunRef 中，以它坐标系为基准，以 origin 点作为原点进行绘制：
- * 基线为过原点的x轴，ascent 即为 CTRun 顶线距基线的距离，descent即为底线距基线的距离。
+/** 获取 CTFrameRef 的内容高度
+ * @note CTFrameRef 的坐标系是以左下角为原点
  */
+CGFloat getHeightWithCTFrame(CTFrameRef frameRef){
+    
+    CFArrayRef lines = CTFrameGetLines(frameRef);
+    int lineCount = (int)CFArrayGetCount(lines);
+    
+    CGPoint origins[lineCount];//以左下角为原点的坐标系
+    for (int i = 0; i < lineCount; i++) {
+        origins[i] = CGPointZero;
+    }
+    CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), origins);
+    
+    CGPoint point = origins[lineCount - 1];//最后一行的 point.y 是最小值
+    CGFloat lineAscent = 0;  //上行高度
+    CGFloat lineDescent = 0; //下行高度
+    CGFloat lineLeading = 0; //行距
+    CTLineRef line = CFArrayGetValueAtIndex(lines, lineCount - 1);
+    CTLineGetTypographicBounds(line, &lineAscent, &lineDescent, &lineLeading);
+    
+    /// 获取该页面的高度 pageHeight
+    CGPathRef path = CTFrameGetPath(frameRef);
+    CGRect bounds = CGPathGetBoundingBox(path);
+    CGFloat pageHeight = CGRectGetHeight(bounds);
+    
+    /// 空白高度 = point.y 是最小值 - 下行高度 - 行距
+    /// 内容高度 = 页面高度 - 空白高度
+    return pageHeight - (point.y - ceil(lineDescent) - lineLeading);
+}
+
+/** 获取指定内容高度
+ * @param attrString 内容
+ * @param widthLimit 宽度限制
+ */
+CGFloat getHeightWithAttributedString(NSAttributedString *attrString,CGFloat widthLimit){
+    CGFloat height = 0;
+    if (attrString.length > 0){
+        // 注意设置的高度必须大于文本高度
+        CGRect drawingRect = CGRectMake(0, 0, widthLimit, 1000);
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
+        CGPathRef path = CGPathCreateWithRect(drawingRect, nil);
+        CTFrameRef frameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil);
+        height = getHeightWithCTFrame(frameRef);
+        
+        /// 释放资源
+        CFRelease(framesetter);
+        CGPathRelease(path);
+        CFRelease(frameRef);
+    }
+    return height;
+}
+
+@end
+
 @implementation YLCoreText (ImageHandler)
 
-/** 计算并设置 CTFrameRef 中的所有图片的坐标
- * @note 单独用 frameSetter 求出的 image 的 frame 是不正确的，那是只绘制 image 而得的坐标
- * 思路： 遍历 CTFrameRef 中的所有 CTRun，检查 CTRun 是不是绑定图片的那个，
+/** 矫正 CTFrame 中的图片坐标
+ * 思路： 遍历 CTFrameRef 中的所有 CTRun，检查 CTRun 否绑定图片，
  *       如果是，根据 CTRun 所在 CTLine 的 origin 以及在 CTLine 中的横向偏移量计算出 CTRun 的原点，
  *       加上其尺寸即为该CTRun的尺寸
  */
 + (void)setImageFrametWithCTFrame:(CTFrameRef)frame{
-    NSArray *arrLines = (NSArray *)CTFrameGetLines(frame);
-    NSInteger count = [arrLines count];
-    CGPoint points[count];
+    CFArrayRef lines = CTFrameGetLines(frame);
+    int lineCount = (int)CFArrayGetCount(lines);
+    CGPoint points[lineCount];
     CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), points);
-    for (int i = 0; i < count; i ++) {//外层for循环，为了取到所有的 CTLine
-        CTLineRef line = (__bridge CTLineRef)arrLines[i];
-        NSArray *arrGlyphRun = (NSArray *)CTLineGetGlyphRuns(line);
-        for (int j = 0; j < arrGlyphRun.count; j ++) {//内层for循环，检查每个 CTRun
-            CTRunRef run = (__bridge CTRunRef)arrGlyphRun[j];
-            NSDictionary * attributes = (NSDictionary *)CTRunGetAttributes(run);
-            CTRunDelegateRef delegate = (__bridge CTRunDelegateRef)[attributes valueForKey:(id)kCTRunDelegateAttributeName];//获取代理属性
+    for (int i = 0; i < lineCount; i ++) {//外层for循环，为了取到所有的 CTLine
+        CTLineRef line = CFArrayGetValueAtIndex(lines, i);
+        
+        CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
+        int runCount = (int)CFArrayGetCount(glyphRuns);
+        for (int j = 0; j < runCount ; j ++) {//内层for循环，检查每个 CTRun
+            CTRunRef run = CFArrayGetValueAtIndex(glyphRuns, j);
+            CFDictionaryRef attributes = CTRunGetAttributes(run);
+            CTRunDelegateRef delegate = CFDictionaryGetValue(attributes, kCTRunDelegateAttributeName);;//获取代理属性
             if (delegate == nil) {
                 continue;
             }
@@ -409,17 +385,19 @@ NSMutableArray<YLPageModel *> *pageingWithAttrString(NSMutableAttributedString *
             if (![model isKindOfClass:[YLImage class]]) {
                 continue;
             }
-            CGPoint linePoint = points[i];//获取CTLine的原点
-            CGFloat ascent;//获取上距
-            CGFloat descent;//获取下距
+            
+            CGPoint linePoint = points[i];//获取当前 CTLine 的原点
+            CGFloat ascent;  //上行高度
+            CGFloat descent; //下行高度
+            CGFloat leading = 0; //行距
             CGRect boundsRun;
             //获取宽、高
-            boundsRun.size.width = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, NULL);
-            boundsRun.size.height = ascent + descent;
+            boundsRun.size.width = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, &leading);
+            boundsRun.size.height = ascent + fabs(descent) + leading;
             //获取对应 CTRun 的 X 偏移量
             CGFloat xOffset = CTLineGetOffsetForStringIndex(line, CTRunGetStringRange(run).location, NULL);
             boundsRun.origin.x = linePoint.x + xOffset;
-            boundsRun.origin.y = linePoint.y - descent;//减去图片的下边距才是图片的原点
+            boundsRun.origin.y = linePoint.y - descent - leading;//图片原点
             CGPathRef path = CTFrameGetPath(frame);//获取绘制区域
             CGRect colRect = CGPathGetBoundingBox(path);//获取绘制区域边框
             model.imageFrame = CGRectOffset(boundsRun, colRect.origin.x, colRect.origin.y);//设置图片坐标
@@ -427,18 +405,51 @@ NSMutableArray<YLPageModel *> *pageingWithAttrString(NSMutableAttributedString *
     }
 }
 
+///上行高度
 static CGFloat ascentCallback(void *ref){
     YLImage *model = (__bridge YLImage *)ref;
     return model.imageFrame.size.height;
 }
 
+///下行高度
 static CGFloat descentCallback(void *ref){
     return 0;
 }
 
+///图片宽度
 static CGFloat widthCallback(void *ref){
     YLImage *model = (__bridge YLImage *)ref;
     return model.imageFrame.size.width;
+}
+
++ (NSAttributedString *)parseImage:(UIImage *)image drawSize:(CGSize)drawSize{
+    /**************** 计算图片宽高 **************/
+    CGSize imageShowSize = image.size;//屏幕上展示的图片尺寸
+    if (image.size.width > drawSize.width) {
+        imageShowSize = CGSizeMake(drawSize.width, image.size.height / image.size.width * drawSize.width);
+    }
+    
+    YLImage *model = [[YLImage alloc]init];
+    model.image = image;
+    model.imageFrame = CGRectMake(0, 0, imageShowSize.width, imageShowSize.height);
+    
+    //注意：此处返回的富文本，最主要的作用是占位！
+    //为图片的绘制留下空白区域
+    CTRunDelegateCallbacks callbacks;
+    memset(&callbacks, 0, sizeof(CTRunDelegateCallbacks));
+    callbacks.version = kCTRunDelegateVersion1;//设置回调版本，默认这个
+    callbacks.getAscent = ascentCallback;//上行高度
+    callbacks.getDescent = descentCallback;//下行高度
+    callbacks.getWidth = widthCallback;//图片宽度
+    CTRunDelegateRef delegate = CTRunDelegateCreate(&callbacks, (__bridge void *)model);
+    
+    //使用0xFFFC作为空白占位符
+    unichar objectReplacementChar = 0xFFFC;
+    NSString *content = [NSString stringWithCharacters:&objectReplacementChar length:1];
+    NSMutableAttributedString *placeholder = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttributeName:model}];
+    CFAttributedStringSetAttribute((CFMutableAttributedStringRef)placeholder, CFRangeMake(0, 1), kCTRunDelegateAttributeName, delegate);
+    CFRelease(delegate);
+    return placeholder;
 }
 
 + (NSAttributedString *)parseImageFromeTextWithURL:(NSString *)url drawSize:(CGSize)drawSize{
@@ -469,19 +480,90 @@ static CGFloat widthCallback(void *ref){
     CTRunDelegateCallbacks callbacks;
     memset(&callbacks, 0, sizeof(CTRunDelegateCallbacks));
     callbacks.version = kCTRunDelegateVersion1;//设置回调版本，默认这个
-    callbacks.getAscent = ascentCallback;//设置图片顶部距离基线的距离
-    callbacks.getDescent = descentCallback;//设置图片底部距离基线的距离
-    callbacks.getWidth = widthCallback;//设置图片宽度
+    callbacks.getAscent = ascentCallback;//上行高度
+    callbacks.getDescent = descentCallback;//下行高度
+    callbacks.getWidth = widthCallback;//图片宽度
     CTRunDelegateRef delegate = CTRunDelegateCreate(&callbacks, (__bridge void *)model);
     
     //使用0xFFFC作为空白占位符
     unichar objectReplacementChar = 0xFFFC;
     NSString *content = [NSString stringWithCharacters:&objectReplacementChar length:1];
-    NSMutableAttributedString *space = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttributeName:model}];
-    CFAttributedStringSetAttribute((CFMutableAttributedStringRef)space, CFRangeMake(0, 1), kCTRunDelegateAttributeName, delegate);
+    NSMutableAttributedString *placeholder = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttributeName:model}];
+    CFAttributedStringSetAttribute((CFMutableAttributedStringRef)placeholder, CFRangeMake(0, 1), kCTRunDelegateAttributeName, delegate);
     CFRelease(delegate);
-    return space;
+    return placeholder;
 }
 
+@end
+
+
+/// CTFrame 上触摸事件的处理：
+@implementation YLCoreText (Touch)
+
+/** 获取触摸位置所在的行 CTLine
+ * @param point 触摸点
+ */
+CTLineRef getTouchLine(CGPoint point,CTFrameRef frameRef){
+    CTLineRef line = nil;
+    if (frameRef == nil) { return line; }
+    
+    CGPathRef path = CTFrameGetPath(frameRef);
+    CGRect bounds = CGPathGetBoundingBox(path);/// 页面边界
+    CGFloat pageWidth = CGRectGetWidth(bounds);/// 页面宽度
+    CGFloat pageHeight = CGRectGetHeight(bounds);/// 页面高度
+    
+    CFArrayRef lines = CTFrameGetLines(frameRef);
+    int lineCount = (int)CFArrayGetCount(lines);
+    if (lineCount < 1) {
+        return line;
+    }
+    
+    CGPoint origins[lineCount];
+    for (int i = 0; i < lineCount; i++) {
+        origins[i] = CGPointZero;
+    }
+    CTFrameGetLineOrigins(frameRef, CFRangeMake(0, 0), origins);
+    for (int i = 0; i < lineCount; i ++) {
+        CGPoint origin = origins[i];
+        CTLineRef tempLine = CFArrayGetValueAtIndex(lines, i);
+        CGFloat lineAscent = 0;  //上行高度
+        CGFloat lineDescent = 0; //下行高度
+        CGFloat lineLeading = 0; //行距
+        CTLineGetTypographicBounds(tempLine, &lineAscent, &lineDescent, &lineLeading);/// 获取CTLine的字形度量
+        CGFloat lineHeight = lineAscent + fabs(lineDescent) + lineLeading;
+        CGRect lineFrame = CGRectMake(origin.x, pageHeight - (origin.y + lineAscent), pageWidth, lineHeight);
+        lineFrame = CGRectInset(lineFrame, -5, -5);
+        if (CGRectContainsPoint(lineFrame, point)) {
+            line = tempLine;
+            break;
+        }
+    }
+    return line;
+}
+
+/** 获得触摸位置那一行文字范围 Range
+ * @param point 触摸点
+ */
+NSRange getTouchLineRange(CGPoint point,CTFrameRef frameRef){
+    NSRange range = NSMakeRange(NSNotFound, 0);
+    CTLineRef line = getTouchLine(point, frameRef);
+    if (line) {
+        CFRange lineRange = CTLineGetStringRange(line);
+        range = NSMakeRange(lineRange.location == kCFNotFound ? NSNotFound : lineRange.location, lineRange.length);
+    }
+    return range;
+}
+
+/** 获得触摸位置文字的Location
+ * @param point 触摸点
+ */
+signed long getTouchLocation(CGPoint point,CTFrameRef frameRef){
+    signed long location = -1;
+    CTLineRef line = getTouchLine(point,frameRef);
+    if (line != nil) {
+        location = CTLineGetStringIndexForPosition(line, point);
+    }
+    return location;
+}
 
 @end

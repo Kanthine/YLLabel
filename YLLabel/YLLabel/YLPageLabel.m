@@ -11,6 +11,7 @@
 
 @interface YLPageCollectionCell : UICollectionViewCell
 @property (nonatomic ,strong) YLLabel *label;
+@property (nonatomic ,strong) YLPageModel *model;
 @end
 
 @implementation YLPageCollectionCell
@@ -29,6 +30,11 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     _label.frame = self.contentView.bounds;
+}
+
+- (void)setModel:(YLPageModel *)model{
+    self.label.content = model.content;
+    self.label.frameRef = model.frameRef;
 }
 
 @end
@@ -55,7 +61,7 @@ YLLabelDelegate>
     if (self) {
         self.backgroundColor = UIColor.clearColor;
         [self addSubview:self.collectionView];
-        self.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        self.scrollDirection = UICollectionViewScrollDirectionVertical;
     }
     return self;
 }
@@ -71,7 +77,11 @@ YLLabelDelegate>
 #pragma mark - UICollectionViewDelegate
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-    return CGSizeMake(CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds));
+    if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
+        return CGSizeMake(CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds));
+    }else{
+        return CGSizeMake(CGRectGetWidth(self.bounds), self.pageModelsArray[indexPath.row].contentHeight);
+    }
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
@@ -80,9 +90,8 @@ YLLabelDelegate>
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YLPageCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"YLPageCollectionCell" forIndexPath:indexPath];
+    cell.model = self.pageModelsArray[indexPath.row];
     cell.label.delegate = self;
-    cell.label.content = self.pageModelsArray[indexPath.row].content;
-    cell.label.frameRef = self.pageModelsArray[indexPath.row].frameRef;
     return cell;
 }
 
@@ -120,6 +129,7 @@ YLLabelDelegate>
         UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
         flowLayout.minimumLineSpacing = 0.1;
         flowLayout.minimumInteritemSpacing = 0.1;
+        
         _collectionView = [[UICollectionView alloc] initWithFrame:UIScreen.mainScreen.bounds collectionViewLayout:flowLayout];
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;

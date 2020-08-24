@@ -24,6 +24,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = UIColor.whiteColor;
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"切换" style:UIBarButtonItemStylePlain target:self action:@selector(rightBarButtonItemClick)];
     [self.view addSubview:self.pageLabel];
 }
 
@@ -39,12 +40,21 @@
         NSString *dataPath = [NSBundle.mainBundle pathForResource:@"Data" ofType:@"txt"];
         NSString *text = [NSString stringWithContentsOfFile:dataPath encoding:NSUTF8StringEncoding error:nil];
         NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:text attributes:@{NSFontAttributeName: [UIFont fontWithName:@"PingFang SC" size:15],NSForegroundColorAttributeName: [UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1.0]}];
-        NSMutableArray<YLPageModel *> *pageModelsArray = pageingWithAttrString(string, self.pageLabel.bounds);
+        handleAttrString(string, self.pageLabel.bounds);
+        NSMutableArray<YLPageModel *> *pageModelsArray = getPageModelsAutoHeight(string, self.pageLabel.bounds);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             self.pageLabel.pageModelsArray = pageModelsArray;
         });
     });
+}
+
+- (void)rightBarButtonItemClick{
+    if (self.pageLabel.scrollDirection == UICollectionViewScrollDirectionVertical) {
+        self.pageLabel.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+    }else{
+        self.pageLabel.scrollDirection = UICollectionViewScrollDirectionVertical;
+    }
 }
 
 #pragma mark - YLPageLabelDelegate

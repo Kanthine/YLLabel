@@ -30,17 +30,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-
 @interface YLPageModel : NSObject
 
-/// 当前页内容
+/// 当前页富文本
 @property (nonatomic, strong) NSAttributedString *content;
-/// 当前页序号
+/// 当前页码
 @property (nonatomic, assign) NSInteger page;
-/// 当前页范围
+/// 当前页文字范围
 @property (nonatomic, assign) NSRange range;
-
+/// 当前页 CTFrame
 @property (nonatomic ,assign) CTFrameRef frameRef;
+/// 当前页高度
+@property (nonatomic, assign) CGFloat contentHeight;
 
 @end
 

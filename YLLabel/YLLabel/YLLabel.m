@@ -54,6 +54,7 @@
     }];
 }
 
+
 /// 绘制
 - (void)drawRect:(CGRect)rect{
     if (_frameRef == nil) {
@@ -63,12 +64,14 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     //2.旋转坐坐标系(默认和UIKit坐标是相反的)
-    CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-    CGContextTranslateCTM(context, 0, CGRectGetHeight(rect));
-    CGContextScaleCTM(context, 1.0, -1.0);
-    //5.开始绘制
+    CGContextSetTextMatrix(context, CGAffineTransformIdentity);//设置当前文本矩阵
+    CGContextTranslateCTM(context, 0, CGRectGetHeight(rect));//文本沿y轴移动
+    CGContextScaleCTM(context, 1.0, -1.0);//文本翻转成为CoreText坐标系
+        
+    //3.绘制文字
     CTFrameDraw(_frameRef, context);
     
+    //4.绘制图片
     [_content enumerateAttributesInRange:NSMakeRange(0, _content.length) options:NSAttributedStringEnumerationReverse usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
         if ([attrs.allKeys containsObject:kYLAttributeName]) {
             YLImage *image = attrs[kYLAttributeName];
