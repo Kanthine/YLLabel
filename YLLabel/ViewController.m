@@ -10,6 +10,8 @@
 #import "YLLabel.h"
 #import "YLPageLabel.h"
 #import "WebViewController.h"
+#import "DemoLabel.h"
+
 
 @interface ViewController ()
 <YLPageLabelDelegate>
@@ -24,7 +26,15 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = UIColor.whiteColor;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"切换" style:UIBarButtonItemStylePlain target:self action:@selector(rightBarButtonItemClick)];
+    
+    
+//    DemoLabel *label = [[DemoLabel alloc] initWithFrame:self.view.bounds];
+//    [self.view addSubview:label];
+    
+    
+    
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"切换滚动方向" style:UIBarButtonItemStylePlain target:self action:@selector(rightBarButtonItemClick)];
     [self.view addSubview:self.pageLabel];
 }
 
@@ -41,7 +51,7 @@
         NSString *text = [NSString stringWithContentsOfFile:dataPath encoding:NSUTF8StringEncoding error:nil];
         NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:text attributes:@{NSFontAttributeName: [UIFont fontWithName:@"PingFang SC" size:15],NSForegroundColorAttributeName: [UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1.0]}];
         handleAttrString(string, self.pageLabel.bounds);
-        NSMutableArray<YLPageModel *> *pageModelsArray = getPageModelsAutoHeight(string, self.pageLabel.bounds);
+        NSMutableArray<YLPageModel *> *pageModelsArray = getPageModels(string, self.pageLabel.bounds);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             self.pageLabel.pageModelsArray = pageModelsArray;

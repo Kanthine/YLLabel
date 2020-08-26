@@ -28,6 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 CTFrameRef getCTFrameWithAttrString(NSAttributedString *attrString, CGRect rect);
 
+/** 获取 CTFrame
+ * @param attrString 绘制内容
+ * @param sizeLimit 绘制区域的大小限制
+ * @param height 设置内容高度
+ */
+CTFrameRef getCTFrameFitAttrString(NSAttributedString *attrString, CGSize sizeLimit,float *height);
 
 /// 通过 [CGRect] 获得合适的 MenuRect
 ///
@@ -70,9 +76,6 @@ NSMutableArray<NSValue *> *getPageRanges(NSAttributedString *attrString, CGRect 
  */
 NSMutableArray<YLPageModel *> *getPageModels(NSMutableAttributedString *attrString, CGRect rect);
 
-///每页的 CTFrame 高度自适应内容
-NSMutableArray<YLPageModel *> *getPageModelsAutoHeight(NSMutableAttributedString *attrString, CGRect rect);
-
 @end
 
 
@@ -84,11 +87,15 @@ NSMutableArray<YLPageModel *> *getPageModelsAutoHeight(NSMutableAttributedString
  */
 CGFloat getHeightWithCTFrame(CTFrameRef frameRef);
 
-/** 获取指定内容高度
+/** 获取指定内容大小
  * @param attrString 内容
  * @param widthLimit 宽度限制
  */
-CGFloat getHeightWithAttributedString(NSAttributedString *attrString,CGFloat widthLimit);
+CGSize getSizeWithAttributedString(NSAttributedString *attrString,CGFloat widthLimit);
+
+/** 获取指定 CTLine Size
+ */
+CGSize getSizeWithCTLine(CTLineRef lineRef);
 
 @end
 

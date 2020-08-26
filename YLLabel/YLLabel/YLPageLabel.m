@@ -27,14 +27,11 @@
     return self;
 }
 
-- (void)layoutSubviews{
-    [super layoutSubviews];
-    _label.frame = self.contentView.bounds;
-}
-
 - (void)setModel:(YLPageModel *)model{
+    _model = model;
     self.label.content = model.content;
     self.label.frameRef = model.frameRef;
+    self.label.frame = CGRectMake(0, 0, CGRectGetWidth(self.contentView.bounds), _model.contentHeight);
 }
 
 @end

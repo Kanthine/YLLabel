@@ -14,7 +14,6 @@ NSAttributedStringKey const kYLAttributeName = @"com.yl.attribute";
 NSString * const kYLImageLinkRegula = @"(?<=\\<ImageLink:).*?(?=\\>)";
 NSString * const kYLWebLinkRegula = @"(?<=\\<WebLink:).*?(?=\\>)";
 
-
 @implementation NSString (YLLabel)
 
 /// 正则搜索相关字符位置
@@ -36,6 +35,22 @@ NSString * const kYLWebLinkRegula = @"(?<=\\<WebLink:).*?(?=\\>)";
 CTFrameRef getCTFrameWithAttrString(NSAttributedString *attrString, CGRect rect){
     CGPathRef path = CGPathCreateWithRect(rect, nil);///绘制局域
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);//设置绘制内容
+    CTFrameRef frameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil);
+    CFRelease(framesetter);
+    CGPathRelease(path);
+    return frameRef;
+}
+
+/** 获取 CTFrame
+ * @param attrString 绘制内容
+ * @param sizeLimit 绘制区域的大小限制
+ * @param height 设置内容高度，可以用来约束展示内容的 view 的高度
+ */
+CTFrameRef getCTFrameFitAttrString(NSAttributedString *attrString, CGSize sizeLimit,float *height){
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);//设置绘制内容
+    CGSize pageSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, sizeLimit, NULL);
+    *height = pageSize.height;
+    CGPathRef path = CGPathCreateWithRect(CGRectMake(0, 0, sizeLimit.width, pageSize.height), nil);///绘制局域
     CTFrameRef frameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil);
     CFRelease(framesetter);
     CGPathRelease(path);
@@ -234,66 +249,17 @@ NSMutableArray<NSValue *> *getPageRanges(NSAttributedString *attrString, CGRect 
  */
 NSMutableArray<YLPageModel *> * getPageModels(NSMutableAttributedString *attrString, CGRect rect){
     NSMutableArray<YLPageModel *> *pageModels = [NSMutableArray array];
-
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
-    CGPathRef path = CGPathCreateWithRect(rect, nil);
-    CFRange range = CFRangeMake(0, 0);
-    NSInteger rangeOffset = 0;
-    do {
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(rangeOffset, 0), path, nil);
-        range = CTFrameGetVisibleStringRange(frame);/// 获取实际填充 CTFrameRef 的字符范围
-                
+    [getPageRanges(attrString, rect) enumerateObjectsUsingBlock:^(NSValue * _Nonnull value, NSUInteger idx, BOOL * _Nonnull stop) {
         YLPageModel *pageModel = [[YLPageModel alloc]init];
-        pageModel.range = NSMakeRange(rangeOffset, range.length);
-        pageModel.content = [attrString attributedSubstringFromRange:pageModel.range];;
-        pageModel.page = pageModels.count;
-        pageModel.frameRef = frame;
+        pageModel.range = value.rangeValue;
+        pageModel.content = [attrString attributedSubstringFromRange:pageModel.range];
+        pageModel.page = idx;
+        float height;
+        pageModel.frameRef = getCTFrameFitAttrString(pageModel.content, rect.size, &height);
+        pageModel.contentHeight = height;
         [YLCoreText setImageFrametWithCTFrame:pageModel.frameRef];
-        pageModel.contentHeight = getHeightWithCTFrame(pageModel.frameRef);
         [pageModels addObject:pageModel];
-        
-        rangeOffset += range.length;
-    } while (range.location + range.length < attrString.length);
-    CFRelease(framesetter);
-    CGPathRelease(path);
-    
-    return pageModels;
-}
-
-///每页的 CTFrame 高度自适应内容
-NSMutableArray<YLPageModel *> *getPageModelsAutoHeight(NSMutableAttributedString *attrString, CGRect rect){
-    NSMutableArray<YLPageModel *> *pageModels = [NSMutableArray array];
-
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
-    CGPathRef path = CGPathCreateWithRect(rect, nil);
-    CFRange range = CFRangeMake(0, 0);
-    NSInteger rangeOffset = 0;
-    do {
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(rangeOffset, 0), path, nil);
-        range = CTFrameGetVisibleStringRange(frame);/// 获取实际填充 CTFrameRef 的字符范围
-        
-        
-        YLPageModel *pageModel = [[YLPageModel alloc]init];
-        pageModel.range = NSMakeRange(rangeOffset, range.length);
-        pageModel.content = [attrString attributedSubstringFromRange:pageModel.range];;
-        pageModel.page = pageModels.count;
-        
-        [YLCoreText setImageFrametWithCTFrame:frame];
-        pageModel.contentHeight = getHeightWithCTFrame(frame);
-                
-        if (fabs(CGRectGetHeight(rect) - pageModel.contentHeight) < 10) {
-            pageModel.frameRef = frame;
-        }else{
-            pageModel.frameRef = getCTFrameWithAttrString(pageModel.content, CGRectMake(0, 0, CGRectGetWidth(rect), pageModel.contentHeight));
-            [YLCoreText setImageFrametWithCTFrame:pageModel.frameRef];
-        }
-        [pageModels addObject:pageModel];
-        
-        
-        rangeOffset += range.length;
-    } while (range.location + range.length < attrString.length);
-    CFRelease(framesetter);
-    CGPathRelease(path);
+    }];
     return pageModels;
 }
 
@@ -327,32 +293,46 @@ CGFloat getHeightWithCTFrame(CTFrameRef frameRef){
     CGPathRef path = CTFrameGetPath(frameRef);
     CGRect bounds = CGPathGetBoundingBox(path);
     CGFloat pageHeight = CGRectGetHeight(bounds);
-    
+        
     /// 空白高度 = point.y 是最小值 - 下行高度 - 行距
     /// 内容高度 = 页面高度 - 空白高度
     return pageHeight - (point.y - ceil(lineDescent) - lineLeading);
 }
 
-/** 获取指定内容高度
+/** 获取指定内容大小
  * @param attrString 内容
  * @param widthLimit 宽度限制
  */
-CGFloat getHeightWithAttributedString(NSAttributedString *attrString,CGFloat widthLimit){
-    CGFloat height = 0;
+CGSize getSizeWithAttributedString(NSAttributedString *attrString,CGFloat widthLimit){
+    CGSize size = CGSizeZero;
     if (attrString.length > 0){
-        // 注意设置的高度必须大于文本高度
-        CGRect drawingRect = CGRectMake(0, 0, widthLimit, 1000);
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attrString);
-        CGPathRef path = CGPathCreateWithRect(drawingRect, nil);
-        CTFrameRef frameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil);
-        height = getHeightWithCTFrame(frameRef);
-        
-        /// 释放资源
-        CFRelease(framesetter);
-        CGPathRelease(path);
-        CFRelease(frameRef);
+        size = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, CGSizeMake(widthLimit, CGFLOAT_MAX), NULL);
+        CFRelease(framesetter);/// 释放资源
     }
-    return height;
+    return size;
+}
+
+/** 获取指定 CTLine 高度
+ */
+CGSize getSizeWithCTLine(CTLineRef lineRef){
+    if (lineRef == nil) {
+        return CGSizeZero;
+    }
+    CGFloat lineAscent = 0;  //上行高度
+    CGFloat lineDescent = 0; //下行高度
+    CGFloat lineLeading = 0; //行距
+    CGFloat width = CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &lineLeading);/// 获取CTLine的字形度量
+    CGFloat height = lineAscent + fabs(lineDescent) + lineLeading;
+    return CGSizeMake(width,height);
+}
+
+CGSize getSizeWithCTLine_1(CTLineRef lineRef){
+    if (lineRef == nil) {
+        return CGSizeZero;
+    }
+    CGRect bounds = CTLineGetBoundsWithOptions(lineRef, kCTLineBoundsExcludeTypographicLeading);
+    return bounds.size;
 }
 
 @end
