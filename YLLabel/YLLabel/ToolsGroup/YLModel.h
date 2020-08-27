@@ -10,25 +10,26 @@
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 
+UIKIT_EXTERN NSAttributedStringKey const _Nonnull kYLAttachmentAttributeName;
+
 NS_ASSUME_NONNULL_BEGIN
 
+//富文本中的链接（图片、网页）
+@interface YLAttachment : NSObject
 
-//CoreText实际上并没有相应API直接将一个图片转换为CTRun并进行绘制，它所能做的只是为图片预留响应的空白区域，而真正的绘制则是交由CoreGraphics完成。
-@interface YLImage : NSObject
-
-@property (nonatomic ,strong) UIImage *image;
+//链接
 @property (nonatomic ,copy) NSString *url;
+
+//网页的标题
+@property (nonatomic ,copy) NSString *title;
+
+//图片的相关信息
+@property (nonatomic ,strong) UIImage *image;
 @property (nonatomic ,assign) CGRect imageFrame;
 
 @end
 
-@interface YLWeb : NSObject
 
-@property (nonatomic ,copy) NSString *title;
-@property (nonatomic ,copy) NSString *url;
-@property (nonatomic ,assign) NSRange range;
-
-@end
 
 @interface YLPageModel : NSObject
 

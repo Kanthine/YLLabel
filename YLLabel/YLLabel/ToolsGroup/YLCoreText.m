@@ -9,7 +9,6 @@
 #import "YLCoreText.h"
 
 
-NSAttributedStringKey const kYLAttributeName = @"com.yl.attribute";
 
 NSString * const kYLImageLinkRegula = @"(?<=\\<ImageLink:).*?(?=\\>)";
 NSString * const kYLWebLinkRegula = @"(?<=\\<WebLink:).*?(?=\\>)";
@@ -191,7 +190,7 @@ void handleAttrString(NSMutableAttributedString *attrString, CGRect rect){
                    NSRange subAllRange = [attrString.string rangeOfString:webFormat];//在修改后的文本中查找替代的位置
                    NSArray *itemArray = [matchString componentsSeparatedByString:@","];
                    
-                   YLWeb *web = [[YLWeb alloc] init];
+                   YLAttachment *web = [[YLAttachment alloc] init];
                    [itemArray enumerateObjectsUsingBlock:^(NSString * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
                        NSArray *itemDict = [item componentsSeparatedByString:@"="];
                        NSString *key = itemDict.firstObject;
@@ -204,7 +203,7 @@ void handleAttrString(NSMutableAttributedString *attrString, CGRect rect){
                    }];
                    NSLog(@"webFormat === %@",matchString);
                                       
-                   [attrString replaceCharactersInRange:subAllRange withAttributedString:[[NSAttributedString alloc]initWithString:web.title attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:UIColor.redColor,kYLAttributeName:web}]];
+                   [attrString replaceCharactersInRange:subAllRange withAttributedString:[[NSAttributedString alloc]initWithString:web.title attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:UIColor.redColor,kYLAttachmentAttributeName:web}]];
                }
            }];
     }
@@ -361,8 +360,8 @@ CGSize getSizeWithCTLine_1(CTLineRef lineRef){
             if (delegate == nil) {
                 continue;
             }
-            YLImage *model = CTRunDelegateGetRefCon(delegate);
-            if (![model isKindOfClass:[YLImage class]]) {
+            YLAttachment *model = CTRunDelegateGetRefCon(delegate);
+            if (![model isKindOfClass:[YLAttachment class]]) {
                 continue;
             }
             
@@ -385,9 +384,38 @@ CGSize getSizeWithCTLine_1(CTLineRef lineRef){
     }
 }
 
+///获取 CTFrameRef 中的所有图片插件
++ (NSMutableArray<YLAttachment *> *)getImagesWithCTFrame:(CTFrameRef)frame{
+    NSMutableArray *resultArray = [NSMutableArray array];
+    
+    CFArrayRef lines = CTFrameGetLines(frame);
+    int lineCount = (int)CFArrayGetCount(lines);
+    CGPoint points[lineCount];
+    CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), points);
+    for (int i = 0; i < lineCount; i ++) {//外层for循环，为了取到所有的 CTLine
+        CTLineRef line = CFArrayGetValueAtIndex(lines, i);
+        
+        CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
+        int runCount = (int)CFArrayGetCount(glyphRuns);
+        for (int j = 0; j < runCount ; j ++) {//内层for循环，检查每个 CTRun
+            CTRunRef run = CFArrayGetValueAtIndex(glyphRuns, j);
+            CFDictionaryRef attributes = CTRunGetAttributes(run);
+            if (attributes) {
+                if (CFDictionaryContainsKey(attributes, kYLAttachmentAttributeName)) {
+                    YLAttachment *attachment = CFDictionaryGetValue(attributes, kYLAttachmentAttributeName);;//获取属性
+                    if (attachment && attachment.image) {
+                        [resultArray addObject:attachment];
+                    }
+                }
+            }
+        }
+    }
+    return resultArray;
+}
+
 ///上行高度
 static CGFloat ascentCallback(void *ref){
-    YLImage *model = (__bridge YLImage *)ref;
+    YLAttachment *model = (__bridge YLAttachment *)ref;
     return model.imageFrame.size.height;
 }
 
@@ -398,7 +426,7 @@ static CGFloat descentCallback(void *ref){
 
 ///图片宽度
 static CGFloat widthCallback(void *ref){
-    YLImage *model = (__bridge YLImage *)ref;
+    YLAttachment *model = (__bridge YLAttachment *)ref;
     return model.imageFrame.size.width;
 }
 
@@ -409,7 +437,7 @@ static CGFloat widthCallback(void *ref){
         imageShowSize = CGSizeMake(drawSize.width, image.size.height / image.size.width * drawSize.width);
     }
     
-    YLImage *model = [[YLImage alloc]init];
+    YLAttachment *model = [[YLAttachment alloc]init];
     model.image = image;
     model.imageFrame = CGRectMake(0, 0, imageShowSize.width, imageShowSize.height);
     
@@ -426,7 +454,7 @@ static CGFloat widthCallback(void *ref){
     //使用0xFFFC作为空白占位符
     unichar objectReplacementChar = 0xFFFC;
     NSString *content = [NSString stringWithCharacters:&objectReplacementChar length:1];
-    NSMutableAttributedString *placeholder = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttributeName:model}];
+    NSMutableAttributedString *placeholder = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttachmentAttributeName:model}];
     CFAttributedStringSetAttribute((CFMutableAttributedStringRef)placeholder, CFRangeMake(0, 1), kCTRunDelegateAttributeName, delegate);
     CFRelease(delegate);
     return placeholder;
@@ -450,7 +478,7 @@ static CGFloat widthCallback(void *ref){
         imageShowSize = CGSizeMake(drawSize.width, image.size.height / image.size.width * drawSize.width);
     }
         
-    YLImage *model = [[YLImage alloc]init];
+    YLAttachment *model = [[YLAttachment alloc]init];
     model.url = url;
     model.image = image;
     model.imageFrame = CGRectMake(0, 0, imageShowSize.width, imageShowSize.height);
@@ -468,7 +496,7 @@ static CGFloat widthCallback(void *ref){
     //使用0xFFFC作为空白占位符
     unichar objectReplacementChar = 0xFFFC;
     NSString *content = [NSString stringWithCharacters:&objectReplacementChar length:1];
-    NSMutableAttributedString *placeholder = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttributeName:model}];
+    NSMutableAttributedString *placeholder = [[NSMutableAttributedString alloc] initWithString:content attributes:@{kYLAttachmentAttributeName:model}];
     CFAttributedStringSetAttribute((CFMutableAttributedStringRef)placeholder, CFRangeMake(0, 1), kCTRunDelegateAttributeName, delegate);
     CFRelease(delegate);
     return placeholder;
@@ -521,6 +549,27 @@ CTLineRef getTouchLine(CGPoint point,CTFrameRef frameRef){
     return line;
 }
 
+/** 获取触摸点的 CTRunRef
+ * @param point 触摸点
+ */
+CTRunRef getTouchRun(CGPoint point,CTFrameRef frameRef){
+    CTRunRef getRun = NULL;
+    CTLineRef lineRef = getTouchLine(point, frameRef);
+    CFArrayRef glyphRuns = CTLineGetGlyphRuns(lineRef);
+    int runCount = (int)CFArrayGetCount(glyphRuns);
+    CGFloat startPoint = 0;
+    for (int j = 0; j < runCount ; j ++) {
+        CTRunRef run = CFArrayGetValueAtIndex(glyphRuns, j);
+        CGFloat width = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);//获取 CTRun 的宽度
+        if (point.x > startPoint && point.x < (startPoint + width)) {
+            getRun = run;
+            break;
+        }
+        startPoint += width;
+    }
+    return getRun;
+}
+
 /** 获得触摸位置那一行文字范围 Range
  * @param point 触摸点
  */
@@ -544,6 +593,28 @@ signed long getTouchLocation(CGPoint point,CTFrameRef frameRef){
         location = CTLineGetStringIndexForPosition(line, point);
     }
     return location;
+}
+
+/** 获取触摸点的 YLAttachment
+ * @param point 触摸点
+ * @return 若没有，则返回 nil
+ */
+YLAttachment *getTouchAttachment(CGPoint point,CTFrameRef frameRef){
+    YLAttachment *getAttachment = nil;
+    CTRunRef run = getTouchRun(point, frameRef);
+    if (run) {
+        CFDictionaryRef attributes = CTRunGetAttributes(run);
+        if (attributes) {
+            if (CFDictionaryContainsKey(attributes, kYLAttachmentAttributeName)) {
+                YLAttachment *attachment = CFDictionaryGetValue(attributes, kYLAttachmentAttributeName);;//获取属性
+                if (attachment) {
+                    getAttachment = attachment;
+                    NSLog(@"%@", attachment);
+                }
+            }
+        }
+    }
+    return getAttachment;
 }
 
 @end

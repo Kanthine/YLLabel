@@ -18,7 +18,6 @@
 
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
-    
     if (self){
         self.backgroundColor = UIColor.clearColor;
         _label = [[YLLabel alloc] init];
@@ -29,7 +28,6 @@
 
 - (void)setModel:(YLPageModel *)model{
     _model = model;
-    self.label.content = model.content;
     self.label.frameRef = model.frameRef;
     self.label.frame = CGRectMake(0, 0, CGRectGetWidth(self.contentView.bounds), _model.contentHeight);
 }

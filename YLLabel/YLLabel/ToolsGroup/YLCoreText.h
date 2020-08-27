@@ -8,10 +8,6 @@
 
 #import "YLModel.h"
 
-
-UIKIT_EXTERN NSAttributedStringKey const _Nonnull kYLAttributeName;
-
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString (YLLabel)
@@ -107,6 +103,9 @@ CGSize getSizeWithCTLine(CTLineRef lineRef);
 /// 矫正 CTFrame 中的图片坐标
 + (void)setImageFrametWithCTFrame:(CTFrameRef)frame;
 
+///获取 CTFrameRef 中的所有图片插件
++ (NSMutableArray<YLAttachment *> *)getImagesWithCTFrame:(CTFrameRef)frame;
+
 /** 将图片处理为 CoreText
  * @param image 图片
  * @param drawSize 画布的尺寸，图片的宽高不能超出 drawSize
@@ -132,6 +131,11 @@ CGSize getSizeWithCTLine(CTLineRef lineRef);
  */
 CTLineRef getTouchLine(CGPoint point,CTFrameRef frameRef);
 
+/** 获取触摸点的 CTRunRef
+ * @param point 触摸点
+ */
+CTRunRef getTouchRun(CGPoint point,CTFrameRef frameRef);
+
 /** 获得触摸位置那一行文字范围 Range
  * @param point 触摸点
  */
@@ -141,6 +145,12 @@ NSRange getTouchLineRange(CGPoint point,CTFrameRef frameRef);
  * @param point 触摸点
  */
 signed long getTouchLocation(CGPoint point,CTFrameRef frameRef);
+
+/** 获取触摸点的 YLAttachment
+ * @param point 触摸点
+ * @return 若没有，则返回 nil
+ */
+YLAttachment *getTouchAttachment(CGPoint point,CTFrameRef frameRef);
 
 @end
 

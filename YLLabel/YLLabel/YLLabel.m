@@ -33,25 +33,12 @@
 
 - (void)tapGestureRecognizerClick:(UITapGestureRecognizer *)tapRecognizer{
     CGPoint point = [tapRecognizer locationInView:self];
-    NSRange range = getTouchLineRange(point, _frameRef);
-    
-    [_content enumerateAttributesInRange:range options:NSAttributedStringEnumerationReverse usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
-            
-        if ([attrs.allKeys containsObject:kYLAttributeName]) {
-            YLImage *image = attrs[kYLAttributeName];
-            if (self.delegate && [self.delegate respondsToSelector:@selector(touchYLLabel:url:)]) {
-                [self.delegate touchYLLabel:self url:image.url];
-            }
-            
-            if ([image isKindOfClass:YLImage.class]) {
-                NSLog(@"image : %@",image.url);
-            }else{
-                YLWeb *web = attrs[kYLAttributeName];
-                NSLog(@"url : %@",web.url);
-            }
-            * stop = YES;
-        }
-    }];
+    YLAttachment *attachment = getTouchAttachment(point, _frameRef);
+    if (attachment && attachment.url) {
+         if (self.delegate && [self.delegate respondsToSelector:@selector(touchYLLabel:url:)]) {
+             [self.delegate touchYLLabel:self url:attachment.url];
+         }
+     }
 }
 
 
@@ -67,18 +54,13 @@
     CGContextSetTextMatrix(context, CGAffineTransformIdentity);//设置当前文本矩阵
     CGContextTranslateCTM(context, 0, CGRectGetHeight(rect));//文本沿y轴移动
     CGContextScaleCTM(context, 1.0, -1.0);//文本翻转成为CoreText坐标系
-        
+    
     //3.绘制文字
     CTFrameDraw(_frameRef, context);
     
     //4.绘制图片
-    [_content enumerateAttributesInRange:NSMakeRange(0, _content.length) options:NSAttributedStringEnumerationReverse usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
-        if ([attrs.allKeys containsObject:kYLAttributeName]) {
-            YLImage *image = attrs[kYLAttributeName];
-            if ([image isKindOfClass:YLImage.class]) {
-                CGContextDrawImage(context, image.imageFrame, image.image.CGImage);
-            }
-        }
+    [[YLCoreText getImagesWithCTFrame:_frameRef] enumerateObjectsUsingBlock:^(YLAttachment * _Nonnull attachment, NSUInteger idx, BOOL * _Nonnull stop) {
+        CGContextDrawImage(context, attachment.imageFrame, attachment.image.CGImage);
     }];
 }
 

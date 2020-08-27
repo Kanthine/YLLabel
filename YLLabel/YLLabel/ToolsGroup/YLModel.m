@@ -8,15 +8,31 @@
 
 #import "YLModel.h"
 
+NSAttributedStringKey const kYLAttachmentAttributeName = @"com.yl.attachment";
 
-@implementation YLImage
+@implementation YLAttachment
+
+- (NSDictionary *)dictionaryRepresentation{
+    NSMutableDictionary *mutableDict = [NSMutableDictionary dictionary];
+    [mutableDict setValue:self.url forKey:@"url"];
+    [mutableDict setValue:self.title forKey:@"title"];
+    if (self.image) {
+        [mutableDict setValue:self.image forKey:@"image"];
+        [mutableDict setValue:[NSValue valueWithCGRect:self.imageFrame] forKey:@"imageFrame"];
+    }
+    return [NSDictionary dictionaryWithDictionary:mutableDict];
+}
+
+- (NSString *)description {
+    NSString *type = self.image ? @"图片" : self.title;
+    return [NSString stringWithFormat:@"%@ : %@",type, [self dictionaryRepresentation]];
+}
+
 
 @end
 
 
-@implementation YLWeb
 
-@end
 
 @implementation YLPageModel
 

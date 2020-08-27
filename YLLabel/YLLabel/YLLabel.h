@@ -22,8 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic ,weak) id <YLLabelDelegate> delegate;
 
 /// 当前页内容(使用固定范围绘制)
-@property (nonatomic ,strong) NSAttributedString *content;
-
 @property (nonatomic ,assign) CTFrameRef frameRef;
 
 @end
