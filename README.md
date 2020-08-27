@@ -2,7 +2,7 @@
 
 小说阅读器的文本展示：使用 CoreText 将文本分页展示！
 
-![文字分页、图文混排、点击事件](https://github.com/Kanthine/YLLabel/blob/master/YLLabel/%E5%B0%8F%E8%AF%B4%E9%98%85%E8%AF%BB%E5%99%A8.gif)
+![文字分页、图文混排、点击事件](https://upload-images.jianshu.io/upload_images/7112462-9ff34d8d0f439531.gif?imageMogr2/auto-orient/strip)
 
 
 ----
