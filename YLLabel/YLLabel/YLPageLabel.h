@@ -7,6 +7,7 @@
 //
 
 #import "YLCoreText.h"
+#import "YLCollectionTransitionAnimationLayout.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,8 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface YLPageLabel : UIView
 
 @property (nonatomic ,weak) id <YLPageLabelDelegate> delegate;
-@property (nonatomic ,assign) UICollectionViewScrollDirection scrollDirection;
 @property (nonatomic ,strong) NSMutableArray<YLPageModel *> *pageModelsArray;
+@property (nonatomic ,assign) YLCollectionTransitionType transitionType;
+
+- (void)scrollToPage;
 
 @end
 

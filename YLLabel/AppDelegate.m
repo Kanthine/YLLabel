@@ -7,7 +7,8 @@
 //
 
 #import "AppDelegate.h"
-#import "ViewController.h"
+#import "YLReaderViewController.h"
+#import "YLReaderPageController.h"
 
 @interface AppDelegate ()
 
@@ -15,14 +16,15 @@
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
     self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
     [self.window makeKeyAndVisible];
     
-    ViewController *vc = [[ViewController alloc]init];
+    [YLReaderManager shareReader];
+    
+    YLReaderViewController *vc = [[YLReaderViewController alloc]init];
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
     nav.navigationBar.translucent = NO;
     self.window.rootViewController = nav;

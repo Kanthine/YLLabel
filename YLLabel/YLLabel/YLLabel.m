@@ -8,6 +8,14 @@
 
 #import "YLLabel.h"
 
+@interface YLLabel ()
+{
+    UITapGestureRecognizer *_tapGestureRecognizer;
+}
+@property (nonatomic ,assign) BOOL isTap;
+
+@end
+
 @implementation YLLabel
 
 - (void)dealloc{
@@ -24,12 +32,39 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = UIColor.clearColor;
-
-        UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerClick:)];
-        [self addGestureRecognizer:tapRecognizer];
+        
+        _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerClick:)];
+        [self addGestureRecognizer:_tapGestureRecognizer];
     }
     return self;
 }
+
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(nonnull UIGestureRecognizer *)otherGestureRecognizer{
+//    if ([gestureRecognizer isKindOfClass:UITapGestureRecognizer.class] &&
+//        [gestureRecognizer isEqual:_tapGestureRecognizer]) {
+//        CGPoint touchPoint = [_tapGestureRecognizer locationInView:self];
+//        YLAttachment *attachment = getTouchAttachment(touchPoint, _frameRef);
+//        if (attachment && attachment.url) {
+//            return YES;
+//        }
+//    }
+//    return NO;
+//}
+
+//- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
+//    if (!_isTap && self.delegate && [self.delegate respondsToSelector:@selector(touchYLLabel:url:)]) {
+//        _isTap = YES;
+//        YLAttachment *attachment = getTouchAttachment(point, _frameRef);
+//        if (attachment && attachment.url) {
+//            [self.delegate touchYLLabel:self url:attachment.url];
+//        }
+//
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            self->_isTap = NO;
+//        });
+//    }
+//    return [super hitTest:point withEvent:event];
+//}
 
 - (void)tapGestureRecognizerClick:(UITapGestureRecognizer *)tapRecognizer{
     CGPoint point = [tapRecognizer locationInView:self];

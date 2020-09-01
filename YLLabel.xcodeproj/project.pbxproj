@@ -8,25 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		1A1555CE24EB74D8006F9F80 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A1555CD24EB74D8006F9F80 /* AppDelegate.m */; };
-		1A1555D424EB74D8006F9F80 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A1555D324EB74D8006F9F80 /* ViewController.m */; };
 		1A1555D924EB74D9006F9F80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A1555D824EB74D9006F9F80 /* Assets.xcassets */; };
 		1A1555DC24EB74D9006F9F80 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1A1555DA24EB74D9006F9F80 /* LaunchScreen.storyboard */; };
 		1A1555DF24EB74D9006F9F80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A1555DE24EB74D9006F9F80 /* main.m */; };
 		1A1555E824EB7725006F9F80 /* YLLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A1555E724EB7725006F9F80 /* YLLabel.m */; };
 		1A1555EF24EB7BB6006F9F80 /* YLPageLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A1555EE24EB7BB6006F9F80 /* YLPageLabel.m */; };
 		1A1555F124EB7DFC006F9F80 /* Data.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1A1555F024EB7DFC006F9F80 /* Data.txt */; };
-		1A4E70D824F4B638002108C3 /* DemoLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A4E70D724F4B638002108C3 /* DemoLabel.m */; };
+		1A64B85E24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B85C24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.m */; };
+		1A64B88924FDE0F0001ACC40 /* YLReaderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B88824FDE0F0001ACC40 /* YLReaderManager.m */; };
+		1A64B88E24FDED09001ACC40 /* YLReaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B88D24FDED09001ACC40 /* YLReaderViewController.m */; };
+		1A64B89124FDED5C001ACC40 /* YLReaderPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B89024FDED5C001ACC40 /* YLReaderPageController.m */; };
+		1A64B89724FDEE8D001ACC40 /* YLSheetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B89324FDEE8D001ACC40 /* YLSheetView.m */; };
+		1A64B89824FDEE8D001ACC40 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B89424FDEE8D001ACC40 /* WebViewController.m */; };
+		1A64B89B24FDF13A001ACC40 /* YLReaderPageContentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B89A24FDF13A001ACC40 /* YLReaderPageContentController.m */; };
+		1A64B89E24FDF238001ACC40 /* YLReaderPageBGController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A64B89D24FDF238001ACC40 /* YLReaderPageBGController.m */; };
 		1A7A0A8624ECB980008D2CDD /* YLCoreText.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A7A0A8224ECB980008D2CDD /* YLCoreText.m */; };
 		1A7A0A8A24ECC606008D2CDD /* YLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A7A0A8924ECC606008D2CDD /* YLModel.m */; };
-		1A7A0A9124ED2818008D2CDD /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A7A0A9024ED2818008D2CDD /* WebViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1A1555C924EB74D8006F9F80 /* YLLabel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YLLabel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A1555CC24EB74D8006F9F80 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1A1555CD24EB74D8006F9F80 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		1A1555D224EB74D8006F9F80 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		1A1555D324EB74D8006F9F80 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		1A1555D824EB74D9006F9F80 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1A1555DB24EB74D9006F9F80 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1A1555DD24EB74D9006F9F80 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -36,14 +39,27 @@
 		1A1555ED24EB7BB6006F9F80 /* YLPageLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLPageLabel.h; sourceTree = "<group>"; };
 		1A1555EE24EB7BB6006F9F80 /* YLPageLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLPageLabel.m; sourceTree = "<group>"; };
 		1A1555F024EB7DFC006F9F80 /* Data.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Data.txt; sourceTree = "<group>"; };
-		1A4E70D624F4B638002108C3 /* DemoLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoLabel.h; sourceTree = "<group>"; };
-		1A4E70D724F4B638002108C3 /* DemoLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoLabel.m; sourceTree = "<group>"; };
+		1A64B85C24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YLCollectionTransitionAnimationLayout.m; sourceTree = "<group>"; };
+		1A64B85D24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YLCollectionTransitionAnimationLayout.h; sourceTree = "<group>"; };
+		1A64B88724FDE0F0001ACC40 /* YLReaderManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLReaderManager.h; sourceTree = "<group>"; };
+		1A64B88824FDE0F0001ACC40 /* YLReaderManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLReaderManager.m; sourceTree = "<group>"; };
+		1A64B88A24FDE22B001ACC40 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		1A64B88C24FDED09001ACC40 /* YLReaderViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLReaderViewController.h; sourceTree = "<group>"; };
+		1A64B88D24FDED09001ACC40 /* YLReaderViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLReaderViewController.m; sourceTree = "<group>"; };
+		1A64B88F24FDED5C001ACC40 /* YLReaderPageController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLReaderPageController.h; sourceTree = "<group>"; };
+		1A64B89024FDED5C001ACC40 /* YLReaderPageController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLReaderPageController.m; sourceTree = "<group>"; };
+		1A64B89324FDEE8D001ACC40 /* YLSheetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YLSheetView.m; sourceTree = "<group>"; };
+		1A64B89424FDEE8D001ACC40 /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
+		1A64B89524FDEE8D001ACC40 /* YLSheetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YLSheetView.h; sourceTree = "<group>"; };
+		1A64B89624FDEE8D001ACC40 /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
+		1A64B89924FDF13A001ACC40 /* YLReaderPageContentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLReaderPageContentController.h; sourceTree = "<group>"; };
+		1A64B89A24FDF13A001ACC40 /* YLReaderPageContentController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLReaderPageContentController.m; sourceTree = "<group>"; };
+		1A64B89C24FDF238001ACC40 /* YLReaderPageBGController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLReaderPageBGController.h; sourceTree = "<group>"; };
+		1A64B89D24FDF238001ACC40 /* YLReaderPageBGController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLReaderPageBGController.m; sourceTree = "<group>"; };
 		1A7A0A8224ECB980008D2CDD /* YLCoreText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YLCoreText.m; sourceTree = "<group>"; };
 		1A7A0A8424ECB980008D2CDD /* YLCoreText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YLCoreText.h; sourceTree = "<group>"; };
 		1A7A0A8824ECC606008D2CDD /* YLModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YLModel.h; sourceTree = "<group>"; };
 		1A7A0A8924ECC606008D2CDD /* YLModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YLModel.m; sourceTree = "<group>"; };
-		1A7A0A8F24ED2818008D2CDD /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
-		1A7A0A9024ED2818008D2CDD /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,15 +94,14 @@
 			children = (
 				1A1555CC24EB74D8006F9F80 /* AppDelegate.h */,
 				1A1555CD24EB74D8006F9F80 /* AppDelegate.m */,
-				1A1555D224EB74D8006F9F80 /* ViewController.h */,
-				1A1555D324EB74D8006F9F80 /* ViewController.m */,
-				1A4E70D624F4B638002108C3 /* DemoLabel.h */,
-				1A4E70D724F4B638002108C3 /* DemoLabel.m */,
-				1A7A0A8F24ED2818008D2CDD /* WebViewController.h */,
-				1A7A0A9024ED2818008D2CDD /* WebViewController.m */,
+				1A64B88724FDE0F0001ACC40 /* YLReaderManager.h */,
+				1A64B88824FDE0F0001ACC40 /* YLReaderManager.m */,
+				1A64B89224FDEE8D001ACC40 /* OtherGroup */,
+				1A64B88B24FDECEC001ACC40 /* YLReaderController */,
 				1A1555F024EB7DFC006F9F80 /* Data.txt */,
 				1A1555E524EB76F5006F9F80 /* YLLabel */,
 				1A1555D824EB74D9006F9F80 /* Assets.xcassets */,
+				1A64B88A24FDE22B001ACC40 /* PrefixHeader.pch */,
 				1A1555DA24EB74D9006F9F80 /* LaunchScreen.storyboard */,
 				1A1555DD24EB74D9006F9F80 /* Info.plist */,
 				1A1555DE24EB74D9006F9F80 /* main.m */,
@@ -106,11 +121,39 @@
 			path = YLLabel;
 			sourceTree = "<group>";
 		};
+		1A64B88B24FDECEC001ACC40 /* YLReaderController */ = {
+			isa = PBXGroup;
+			children = (
+				1A64B88C24FDED09001ACC40 /* YLReaderViewController.h */,
+				1A64B88D24FDED09001ACC40 /* YLReaderViewController.m */,
+				1A64B88F24FDED5C001ACC40 /* YLReaderPageController.h */,
+				1A64B89024FDED5C001ACC40 /* YLReaderPageController.m */,
+				1A64B89924FDF13A001ACC40 /* YLReaderPageContentController.h */,
+				1A64B89A24FDF13A001ACC40 /* YLReaderPageContentController.m */,
+				1A64B89C24FDF238001ACC40 /* YLReaderPageBGController.h */,
+				1A64B89D24FDF238001ACC40 /* YLReaderPageBGController.m */,
+			);
+			path = YLReaderController;
+			sourceTree = "<group>";
+		};
+		1A64B89224FDEE8D001ACC40 /* OtherGroup */ = {
+			isa = PBXGroup;
+			children = (
+				1A64B89624FDEE8D001ACC40 /* WebViewController.h */,
+				1A64B89424FDEE8D001ACC40 /* WebViewController.m */,
+				1A64B89524FDEE8D001ACC40 /* YLSheetView.h */,
+				1A64B89324FDEE8D001ACC40 /* YLSheetView.m */,
+			);
+			path = OtherGroup;
+			sourceTree = "<group>";
+		};
 		1A7A0A8124ECB980008D2CDD /* ToolsGroup */ = {
 			isa = PBXGroup;
 			children = (
 				1A7A0A8424ECB980008D2CDD /* YLCoreText.h */,
 				1A7A0A8224ECB980008D2CDD /* YLCoreText.m */,
+				1A64B85D24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.h */,
+				1A64B85C24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.m */,
 				1A7A0A8824ECC606008D2CDD /* YLModel.h */,
 				1A7A0A8924ECC606008D2CDD /* YLModel.m */,
 			);
@@ -187,15 +230,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A1555D424EB74D8006F9F80 /* ViewController.m in Sources */,
 				1A1555E824EB7725006F9F80 /* YLLabel.m in Sources */,
 				1A7A0A8A24ECC606008D2CDD /* YLModel.m in Sources */,
-				1A4E70D824F4B638002108C3 /* DemoLabel.m in Sources */,
-				1A7A0A9124ED2818008D2CDD /* WebViewController.m in Sources */,
+				1A64B88E24FDED09001ACC40 /* YLReaderViewController.m in Sources */,
+				1A64B89E24FDF238001ACC40 /* YLReaderPageBGController.m in Sources */,
+				1A64B85E24FDD805001ACC40 /* YLCollectionTransitionAnimationLayout.m in Sources */,
 				1A1555EF24EB7BB6006F9F80 /* YLPageLabel.m in Sources */,
 				1A1555CE24EB74D8006F9F80 /* AppDelegate.m in Sources */,
+				1A64B89124FDED5C001ACC40 /* YLReaderPageController.m in Sources */,
+				1A64B89824FDEE8D001ACC40 /* WebViewController.m in Sources */,
+				1A64B89B24FDF13A001ACC40 /* YLReaderPageContentController.m in Sources */,
+				1A64B89724FDEE8D001ACC40 /* YLSheetView.m in Sources */,
 				1A7A0A8624ECB980008D2CDD /* YLCoreText.m in Sources */,
 				1A1555DF24EB74D9006F9F80 /* main.m in Sources */,
+				1A64B88924FDE0F0001ACC40 /* YLReaderManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +377,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = M2NC8A2MPU;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "${SRCROOT}/YLLabel/PrefixHeader.pch";
 				INFOPLIST_FILE = YLLabel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -347,6 +397,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = M2NC8A2MPU;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "${SRCROOT}/YLLabel/PrefixHeader.pch";
 				INFOPLIST_FILE = YLLabel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (

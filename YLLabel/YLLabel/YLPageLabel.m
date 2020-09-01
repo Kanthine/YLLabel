@@ -19,7 +19,7 @@
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self){
-        self.backgroundColor = UIColor.clearColor;
+        self.backgroundColor = UIColor.whiteColor;
         _label = [[YLLabel alloc] init];
         [self.contentView addSubview:_label];
     }
@@ -56,7 +56,6 @@ YLLabelDelegate>
     if (self) {
         self.backgroundColor = UIColor.clearColor;
         [self addSubview:self.collectionView];
-        self.scrollDirection = UICollectionViewScrollDirectionVertical;
     }
     return self;
 }
@@ -71,11 +70,23 @@ YLLabelDelegate>
 
 #pragma mark - UICollectionViewDelegate
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
-        return CGSizeMake(CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds));
+- (void)scrollToPage{
+    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:YLReaderManager.shareReader.page inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if (self.transitionType == YLCollectionTransitionScroll) {
+        
     }else{
-        return CGSizeMake(CGRectGetWidth(self.bounds), self.pageModelsArray[indexPath.row].contentHeight);
+        YLReaderManager.shareReader.page = (NSInteger)scrollView.contentOffset.x / CGRectGetWidth(scrollView.bounds);
+    }
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+    if (self.transitionType == YLCollectionTransitionScroll) {
+        return CGSizeMake(CGRectGetWidth(collectionView.bounds), self.pageModelsArray[indexPath.row].contentHeight);
+    }else{
+        return CGSizeMake(CGRectGetWidth(collectionView.bounds), CGRectGetHeight(collectionView.bounds));
     }
 }
 
@@ -95,6 +106,7 @@ YLLabelDelegate>
 - (void)setFrame:(CGRect)frame{
     [super setFrame:frame];
     self.collectionView.frame = self.bounds;
+    [self.collectionView.collectionViewLayout invalidateLayout];
     [self.collectionView reloadData];
 }
 
@@ -103,33 +115,34 @@ YLLabelDelegate>
     [self.collectionView reloadData];
 }
 
-- (void)setScrollDirection:(UICollectionViewScrollDirection)scrollDirection{
-    ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).scrollDirection = scrollDirection;
-    
-    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+- (void)setTransitionType:(YLCollectionTransitionType)transitionType{
+    YLCollectionTransitionAnimationLayout *transitionLayout = (YLCollectionTransitionAnimationLayout *)self.collectionView.collectionViewLayout;
+    transitionLayout.transitionType = transitionType;
+    if (transitionType == YLCollectionTransitionScroll) {
         self.collectionView.pagingEnabled = NO;
     }else{
         self.collectionView.pagingEnabled = YES;
     }
-    
     [self.collectionView reloadData];
 }
 
-- (UICollectionViewScrollDirection)scrollDirection{
-    return ((UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout).scrollDirection;
+- (YLCollectionTransitionType)transitionType{
+    YLCollectionTransitionAnimationLayout *transitionLayout = (YLCollectionTransitionAnimationLayout *)self.collectionView.collectionViewLayout;
+    return transitionLayout.transitionType;
 }
 
 - (UICollectionView *)collectionView{
     if (_collectionView == nil){
-        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        flowLayout.minimumLineSpacing = 0.1;
-        flowLayout.minimumInteritemSpacing = 0.1;
+        YLCollectionTransitionAnimationLayout *flowLayout = [[YLCollectionTransitionAnimationLayout alloc] init];
+        flowLayout.transitionType = YLCollectionTransitionOpen;
+        flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         
         _collectionView = [[UICollectionView alloc] initWithFrame:UIScreen.mainScreen.bounds collectionViewLayout:flowLayout];
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.showsHorizontalScrollIndicator = NO;
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
+        _collectionView.pagingEnabled = YES;
         _collectionView.backgroundColor = UIColor.clearColor;
         [_collectionView registerClass:[YLPageCollectionCell class] forCellWithReuseIdentifier:@"YLPageCollectionCell"];
         if (@available(iOS 11.0, *)) {
