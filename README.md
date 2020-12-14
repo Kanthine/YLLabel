@@ -1,8 +1,13 @@
 # YLLabel
 
-小说阅读器的文本展示：使用 CoreText 将文本分页展示！
+小说阅读器:
+* 文本展示：使用 CoreText 将文本分页展示；
+* 翻页方式：仿真翻页、覆盖翻页、滚动翻页、平移翻页的；
 
-![文字分页、图文混排、点击事件](https://upload-images.jianshu.io/upload_images/7112462-9ff34d8d0f439531.gif?imageMogr2/auto-orient/strip)
+
+阅读器点击链接|阅读器仿真翻页|阅读器覆盖翻页|阅读器其它翻页
+:-: |:-: |:-: |:-:
+![点击链接.gif](https://upload-images.jianshu.io/upload_images/7112462-62d73916ea55f9ad.gif?imageMogr2/auto-orient/strip) | ![仿真翻页.gif](https://upload-images.jianshu.io/upload_images/7112462-ba3c188a830f89a7.gif?imageMogr2/auto-orient/strip) | ![覆盖翻页.gif](https://upload-images.jianshu.io/upload_images/7112462-21d3131ea476743d.gif?imageMogr2/auto-orient/strip) | ![平移、滚动、无效果等翻页.gif](https://upload-images.jianshu.io/upload_images/7112462-3c0028c0d131392f.gif?imageMogr2/auto-orient/strip)
 
 
 ----
